@@ -1,8 +1,8 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const fs = require("fs");
 const path = require("path");
 
-module.exports = {
-  entry: "./src/001.setup/index.ts",
+const common = {
   devtool: "inline-source-map",
   module: {
     rules: [
@@ -16,19 +16,41 @@ module.exports = {
   resolve: {
     extensions: [".ts", ".js"],
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      title: "our project",
-      //template: "src/custom.html",
-    }),
-  ],
-  output: {
-    filename: "bundle.js",
-    path: path.resolve(__dirname, "dist"),
-  },
-  devServer: {
-    static: path.join(__dirname, "dist"),
-    compress: true,
-    port: 4000,
-  },
 };
+
+const configs = [];
+const srcDir = path.resolve(__dirname, "src");
+
+fs.readdirSync(srcDir).forEach((file) => {
+  const stat = fs.statSync(srcDir + "/" + file);
+  if (stat.isDirectory()) {
+    const htmlWebpackConfig = {
+      title: file,
+    };
+    if (fs.existsSync(srcDir + "/" + file + "/index.html")) {
+      htmlWebpackConfig.template = srcDir + "/" + file + "/index.html";
+    }
+
+    const config = Object.assign({}, common, {
+      name: file,
+      entry: path.resolve(__dirname, "src", file, "index.ts"),
+      output: {
+        path: path.resolve(__dirname, "dist", file),
+        publicPath: "/" + file,
+        filename: "index.min.js",
+      },
+      plugins: [new HtmlWebpackPlugin(htmlWebpackConfig)],
+    });
+
+    if (configs.length === 0) {
+      config.devServer = {
+        static: path.join(__dirname, "dist"),
+        compress: true,
+      };
+    }
+
+    configs.push(config);
+  }
+});
+
+module.exports = configs;
