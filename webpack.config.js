@@ -37,7 +37,7 @@ fs.readdirSync(srcDir).forEach((file) => {
       output: {
         path: path.resolve(__dirname, "dist", file),
         publicPath: "/" + file,
-        filename: "index.min.js",
+        filename: "bundle.js",
       },
       plugins: [new HtmlWebpackPlugin(htmlWebpackConfig)],
     });
@@ -45,7 +45,6 @@ fs.readdirSync(srcDir).forEach((file) => {
     if (configs.length === 0) {
       config.devServer = {
         static: path.join(__dirname, "dist"),
-        compress: true,
       };
     }
 
