@@ -40,4 +40,16 @@ if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
 
 gl.useProgram(program);
 
-gl.drawArrays(gl.POINTS, 0, 1);
+function draw() {
+  gl.drawArrays(gl.POINTS, 0, 1);
+  requestAnimationFrame(draw);
+}
+
+const resizeObserver = new ResizeObserver(() => {
+  canvas.width = Math.round(canvas.clientWidth * devicePixelRatio);
+  canvas.height = Math.round(canvas.clientHeight * devicePixelRatio);
+  gl.viewport(0, 0, canvas.width, canvas.height);
+});
+resizeObserver.observe(canvas);
+
+requestAnimationFrame(draw);
