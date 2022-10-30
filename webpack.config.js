@@ -12,6 +12,11 @@ const common = {
         exclude: /node_modules/,
       },
       {
+        test: /\.(glsl|vs|fs|vert|frag)$/,
+        exclude: /node_modules/,
+        use: ["raw-loader", "glslify-loader"],
+      },
+      {
         test: /\.s[ac]ss$/i,
         use: [
           // Creates `style` nodes from JS strings
@@ -56,6 +61,7 @@ fs.readdirSync(srcDir).forEach((file) => {
     if (configs.length === 0) {
       config.devServer = {
         static: path.join(__dirname, "dist"),
+        open: true,
       };
     }
 

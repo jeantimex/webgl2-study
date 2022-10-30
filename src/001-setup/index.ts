@@ -1,55 +1,13 @@
-import "./style.scss";
+import vertexShaderSource from "./glsl/vertex.vert";
+import fragmentShaderSource from "./glsl/fragment.frag";
+import {setUpWebGL} from '../common';
 
-const vertexShaderSource = `#version 300 es
-#pragma vscode_glsllint_stage: vert
-void main()
-{
-    gl_PointSize = 150.0;
-    gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
-}`;
+import "../common/style.scss";
 
-const fragmentShaderSource = `#version 300 es
-#pragma vscode_glsllint_stage: frag
-precision mediump float;
-out vec4 fragColor;
-void main()
-{
-    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
-}`;
+const canvas = document.querySelector("canvas");
 
-const canvas = document.querySelector('canvas');
-const gl = canvas.getContext('webgl2');
-const program = gl.createProgram();
-
-const vertexShader = gl.createShader(gl.VERTEX_SHADER);
-gl.shaderSource(vertexShader, vertexShaderSource);
-gl.compileShader(vertexShader);
-gl.attachShader(program, vertexShader);
-
-const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-gl.shaderSource(fragmentShader, fragmentShaderSource);
-gl.compileShader(fragmentShader);
-gl.attachShader(program, fragmentShader);
-
-gl.linkProgram(program);
-
-if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    console.log(gl.getShaderInfoLog(vertexShader));
-    console.log(gl.getShaderInfoLog(fragmentShader));
-}
-
-gl.useProgram(program);
-
-function draw() {
+const drawCallback = (gl: WebGL2RenderingContext) => {
   gl.drawArrays(gl.POINTS, 0, 1);
-  requestAnimationFrame(draw);
 }
 
-const resizeObserver = new ResizeObserver(() => {
-  canvas.width = Math.round(canvas.clientWidth * devicePixelRatio);
-  canvas.height = Math.round(canvas.clientHeight * devicePixelRatio);
-  gl.viewport(0, 0, canvas.width, canvas.height);
-});
-resizeObserver.observe(canvas);
-
-requestAnimationFrame(draw);
+setUpWebGL({canvas, vertexShaderSource, fragmentShaderSource, drawCallback});
