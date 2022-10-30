@@ -2,11 +2,12 @@ interface WebGLSetupOptions {
   canvas: HTMLCanvasElement;
   vertexShaderSource: string;
   fragmentShaderSource: string;
-  drawCallback: Function;
+  autoResize?: boolean;
+  resizeCallback?: Function;
 }
 
-export function setUpWebGL(options: WebGLSetupOptions) {
-  const { canvas, vertexShaderSource, fragmentShaderSource, drawCallback } =
+export function setUpWebGL(options: WebGLSetupOptions): WebGL2RenderingContext {
+  const { canvas, vertexShaderSource, fragmentShaderSource, autoResize, resizeCallback } =
     options;
   const gl = canvas.getContext("webgl2");
   const program = gl.createProgram();
@@ -30,17 +31,20 @@ export function setUpWebGL(options: WebGLSetupOptions) {
 
   gl.useProgram(program);
 
-  const resizeObserver = new ResizeObserver(() => {
-    canvas.width = Math.round(canvas.clientWidth * devicePixelRatio);
-    canvas.height = Math.round(canvas.clientHeight * devicePixelRatio);
-    gl.viewport(0, 0, canvas.width, canvas.height);
-  });
-  resizeObserver.observe(canvas);
+  gl.viewport(0, 0, canvas.width, canvas.height);
 
-  const draw = () => {
-    drawCallback(gl);
-    requestAnimationFrame(draw);
-  };
+  if (autoResize) {
+    const resizeObserver = new ResizeObserver(() => {
+      canvas.width = Math.round(canvas.clientWidth);
+      canvas.height = Math.round(canvas.clientHeight);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+  
+      if (resizeCallback) {
+        resizeCallback(gl);
+      }
+    });
+    resizeObserver.observe(canvas);
+  }
 
-  requestAnimationFrame(draw);
+  return gl;
 }
