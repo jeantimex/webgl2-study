@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const fs = require("fs");
 const path = require("path");
+const webpack = require("webpack");
 
 const common = {
   devtool: "inline-source-map",
@@ -34,7 +35,30 @@ const common = {
   },
 };
 
-const configs = [];
+const configs = [
+  {
+    ...common,
+    name: "main",
+    entry: path.resolve(__dirname, "src", "index.ts"),
+    output: {
+      path: path.resolve(__dirname, "dist"),
+      publicPath: "/",
+      filename: "main.js",
+    },
+    plugins: [
+      new HtmlWebpackPlugin({ title: "WebGL2 Study" }),
+      new webpack.DefinePlugin({
+        "process.env": {
+          APPS: JSON.stringify("APPS"),
+        },
+      }),
+    ],
+    devServer: {
+      static: path.join(__dirname, "dist"),
+      open: true,
+    },
+  },
+];
 const srcDir = path.resolve(__dirname, "src");
 
 fs.readdirSync(srcDir).forEach((file) => {
@@ -57,13 +81,6 @@ fs.readdirSync(srcDir).forEach((file) => {
       },
       plugins: [new HtmlWebpackPlugin(htmlWebpackConfig)],
     });
-
-    if (configs.length === 0) {
-      config.devServer = {
-        static: path.join(__dirname, "dist"),
-        open: true,
-      };
-    }
 
     configs.push(config);
   }
