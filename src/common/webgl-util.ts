@@ -2,13 +2,53 @@ interface WebGLSetupOptions {
   canvas: HTMLCanvasElement;
   vertexShaderSource: string;
   fragmentShaderSource: string;
-  autoResize?: boolean;
-  resizeCallback?: Function;
+  width?: string;
+  height?: string;
+  draw: Function;
 }
 
-export function setUpWebGL(options: WebGLSetupOptions): WebGL2RenderingContext {
-  const { canvas, vertexShaderSource, fragmentShaderSource, autoResize, resizeCallback } =
-    options;
+/**
+ * Adjusts the canvas drawing buffer based on its client size.
+ *
+ * @param {WebGL2RenderingContext} gl
+ * @param {string} width
+ * @param {string} height
+ */
+function resizeCanvasSize(
+  gl: WebGL2RenderingContext,
+  width: string,
+  height: string
+) {
+  const canvas = gl.canvas;
+
+  canvas.style.width = width;
+  canvas.style.height = height;
+
+  // Lookup the size the browser is displaying the canvas in CSS pixels.
+  const dpr = window.devicePixelRatio || 1;
+  const displayWidth = Math.round(canvas.clientWidth * dpr);
+  const displayHeight = Math.round(canvas.clientHeight * dpr);
+
+  // Check if the canvas is not the same size.
+  const needResize =
+    canvas.width !== displayWidth || canvas.height !== displayHeight;
+
+  if (needResize) {
+    canvas.width = displayWidth;
+    canvas.height = displayHeight;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  }
+}
+
+export function setUpWebGL(options: WebGLSetupOptions) {
+  const {
+    canvas,
+    vertexShaderSource,
+    fragmentShaderSource,
+    width = "300px",
+    height = "150px",
+    draw,
+  } = options;
   const gl = canvas.getContext("webgl2");
   const program = gl.createProgram();
 
@@ -31,20 +71,15 @@ export function setUpWebGL(options: WebGLSetupOptions): WebGL2RenderingContext {
 
   gl.useProgram(program);
 
-  gl.viewport(0, 0, canvas.width, canvas.height);
+  const resizeObserver = new ResizeObserver(() => {
+    resizeCanvasSize(gl, width, height);
+    draw(gl);
+  });
+  resizeObserver.observe(canvas);
 
-  if (autoResize) {
-    const resizeObserver = new ResizeObserver(() => {
-      canvas.width = Math.round(canvas.clientWidth);
-      canvas.height = Math.round(canvas.clientHeight);
-      gl.viewport(0, 0, canvas.width, canvas.height);
-  
-      if (resizeCallback) {
-        resizeCallback(gl);
-      }
-    });
-    resizeObserver.observe(canvas);
+  const drawCallback = () => {
+    draw(gl);
+    requestAnimationFrame(drawCallback);
   }
-
-  return gl;
+  requestAnimationFrame(drawCallback);
 }
