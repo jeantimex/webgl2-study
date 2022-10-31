@@ -4,7 +4,9 @@ import { setUpWebGL } from "../common";
 
 import "../common/style.scss";
 
-const canvas = document.querySelector("canvas");
+const canvas = document.createElement('canvas');
+document.body.appendChild(canvas);
+
 const draw = (gl: WebGL2RenderingContext) => {
   gl.drawArrays(gl.POINTS, 0, 1);
 };
