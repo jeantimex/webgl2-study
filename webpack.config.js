@@ -35,6 +35,10 @@ const common = {
   },
 };
 
+const srcDir = path.resolve(__dirname, "src");
+const files = fs.readdirSync(srcDir);
+const apps = files.filter((file) => /^\d{3}/.test(file));
+
 const configs = [
   {
     ...common,
@@ -49,7 +53,7 @@ const configs = [
       new HtmlWebpackPlugin({ title: "WebGL2 Study" }),
       new webpack.DefinePlugin({
         "process.env": {
-          APPS: JSON.stringify("APPS"),
+          APPS: JSON.stringify(apps),
         },
       }),
     ],
@@ -59,9 +63,8 @@ const configs = [
     },
   },
 ];
-const srcDir = path.resolve(__dirname, "src");
 
-fs.readdirSync(srcDir).forEach((file) => {
+for (const file of apps) {
   const stat = fs.statSync(srcDir + "/" + file);
   if (stat.isDirectory()) {
     const htmlWebpackConfig = {
@@ -84,6 +87,6 @@ fs.readdirSync(srcDir).forEach((file) => {
 
     configs.push(config);
   }
-});
+}
 
 module.exports = configs;

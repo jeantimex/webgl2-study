@@ -4,8 +4,9 @@
   "description": "",
   "private": true,
   "scripts": {
+    "clean": "rimraf dist",
     "dev": "webpack-dev-server --mode development",
-    "build": "webpack --mode production"
+    "build": "npm run clean && webpack --mode production"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
     "glslify-loader": "^2.0.0",
     "html-webpack-plugin": "^5.5.0",
     "raw-loader": "^4.0.2",
+    "rimraf": "^3.0.2",
     "sass": "^1.55.0",
     "sass-loader": "^13.1.0",
     "style-loader": "^3.3.1",

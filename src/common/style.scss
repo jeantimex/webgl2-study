@@ -7,3 +7,11 @@ body {
 canvas {
   display: block;
 }
+
+a {
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
