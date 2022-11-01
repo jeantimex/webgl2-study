@@ -1,5 +1,5 @@
-import vertexShaderSource from "./vertex.vert";
-import fragmentShaderSource from "./fragment.frag";
+import vertexShaderSource from "./glsl/vertex.vert";
+import fragmentShaderSource from "./glsl/fragment.frag";
 import { setUpWebGL } from "../common";
 
 import "../common/style.scss";
