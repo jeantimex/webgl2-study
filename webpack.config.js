@@ -1,7 +1,11 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const fs = require("fs");
 const path = require("path");
 const webpack = require("webpack");
+
+const isProduction =
+  process.argv[process.argv.indexOf("--mode") + 1] === "production";
 
 const common = {
   devtool: "inline-source-map",
@@ -21,11 +25,16 @@ const common = {
         test: /\.s[ac]ss$/i,
         use: [
           // Creates `style` nodes from JS strings
-          "style-loader",
+          isProduction ? MiniCssExtractPlugin.loader : "style-loader",
           // Translates CSS into CommonJS
           "css-loader",
           // Compiles Sass to CSS
-          "sass-loader",
+          {
+            loader: "sass-loader",
+            options: {
+              sourceMap: true,
+            },
+          },
         ],
       },
     ],
@@ -51,6 +60,7 @@ const configs = [
     },
     plugins: [
       new HtmlWebpackPlugin({ title: "WebGL2 Study" }),
+      new MiniCssExtractPlugin({ filename: "[name].css" }),
       new webpack.DefinePlugin({
         "process.env": {
           APPS: JSON.stringify(apps),
@@ -82,7 +92,10 @@ for (const file of apps) {
         publicPath: "/" + file,
         filename: "bundle.js",
       },
-      plugins: [new HtmlWebpackPlugin(htmlWebpackConfig)],
+      plugins: [
+        new HtmlWebpackPlugin(htmlWebpackConfig),
+        new MiniCssExtractPlugin({ filename: "bundle.css" }),
+      ],
     });
 
     configs.push(config);
