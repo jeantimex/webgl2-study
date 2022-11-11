@@ -1,8 +1,8 @@
-import vertexShaderSource from "./glsl/vertex.vert";
-import fragmentShaderSource from "./glsl/fragment.frag";
-import { setUpWebGL } from "../common";
+import vertexShaderSource from './glsl/vertex.vert';
+import fragmentShaderSource from './glsl/fragment.frag';
+import { setUpWebGL } from '../common';
 
-import "../common/style.scss";
+import '../common/style.scss';
 
 const canvas = document.createElement('canvas');
 document.body.appendChild(canvas);
@@ -15,7 +15,7 @@ setUpWebGL({
   canvas,
   vertexShaderSource,
   fragmentShaderSource,
-  width: "100%",
-  height: "100%",
+  width: '100%',
+  height: '100%',
   draw,
 });
